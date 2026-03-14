@@ -1,0 +1,1751 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>大模型应用的三个阶段与 toB 机会 — SensePedia Opportunity Analysis</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   Opportunity Analysis — Standalone Styles
+   Aesthetic: Editorial research paper (warm parchment palette)
+   ============================================================ */
+
+/* --- Design Tokens --- */
+:root {
+  --bg:            #FAFAF8;
+  --bg-warm:       #F5F3EF;
+  --surface:       #FFFFFF;
+  --surface-dim:   #F0EEEA;
+  --surface-code:  #1B1D22;
+
+  --ink:           #1A1A1A;
+  --ink-secondary: #4A4A48;
+  --ink-tertiary:  #7A7A76;
+  --ink-faint:     #A8A8A3;
+  --ink-on-dark:   #E8E6E1;
+  --ink-code:      #D4D4D8;
+
+  --accent:        #D14D35;
+  --accent-soft:   rgba(209, 77, 53, 0.08);
+  --accent-mid:    rgba(209, 77, 53, 0.15);
+  --accent-2:      #2563EB;
+  --accent-2-soft: rgba(37, 99, 235, 0.07);
+  --accent-3:      #0D9488;
+  --accent-3-soft: rgba(13, 148, 136, 0.07);
+  --accent-4:      #7C3AED;
+  --accent-4-soft: rgba(124, 58, 237, 0.07);
+  --accent-5:      #D97706;
+  --accent-5-soft: rgba(217, 119, 6, 0.07);
+  --accent-6:      #16A34A;
+  --accent-6-soft: rgba(22, 163, 74, 0.07);
+
+  --border:        rgba(26, 26, 26, 0.08);
+  --border-strong: rgba(26, 26, 26, 0.15);
+
+  --font-display: 'Newsreader', 'Noto Serif CJK SC', 'Source Han Serif SC', 'PingFang SC', Georgia, serif;
+  --font-body:    'DM Sans', 'PingFang SC', 'Noto Sans CJK SC', 'Microsoft YaHei', -apple-system, sans-serif;
+  --font-mono:    'JetBrains Mono', 'SF Mono', 'Fira Code', 'Consolas', monospace;
+
+  --size-xs:   0.75rem;
+  --size-sm:   0.875rem;
+  --size-base: 1.0625rem;
+  --size-lg:   1.25rem;
+  --size-xl:   1.5rem;
+  --size-2xl:  2rem;
+  --size-3xl:  2.75rem;
+  --size-4xl:  3.5rem;
+
+  --leading-tight:  1.25;
+  --leading-snug:   1.4;
+  --leading-normal: 1.75;
+
+  --measure: 72ch;
+
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-20: 5rem;
+  --space-24: 6rem;
+
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --duration-fast: 0.2s;
+  --duration-med:  0.4s;
+  --duration-slow: 0.7s;
+
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md: 0 4px 16px rgba(0,0,0,0.06);
+  --shadow-lg: 0 12px 40px rgba(0,0,0,0.08);
+}
+
+/* --- Reset & Base --- */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-size: 16px;
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: var(--size-base);
+  line-height: var(--leading-normal);
+  min-height: 100vh;
+}
+
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.3;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  z-index: 9999;
+}
+
+::selection {
+  background: var(--accent-mid);
+  color: var(--ink);
+}
+
+img { max-width: 100%; display: block; }
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+/* --- Scroll Progress Bar --- */
+.scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 3px;
+  width: 0%;
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  z-index: 10000;
+  transition: width 0.1s linear;
+  border-radius: 0 2px 2px 0;
+}
+
+/* --- Topbar --- */
+.doc-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  backdrop-filter: blur(16px) saturate(1.4);
+  -webkit-backdrop-filter: blur(16px) saturate(1.4);
+  background: rgba(250, 250, 248, 0.85);
+  border-bottom: 1px solid var(--border);
+  padding: var(--space-4) var(--space-8);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.doc-topbar-brand {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: var(--size-sm);
+  letter-spacing: 0.04em;
+  color: var(--ink-tertiary);
+}
+
+.doc-topbar-brand strong {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.doc-topbar-date {
+  font-family: var(--font-mono);
+  font-size: var(--size-xs);
+  color: var(--ink-faint);
+}
+
+/* --- Main Content --- */
+.doc-main {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: var(--space-12) var(--space-8) var(--space-24);
+}
+
+@media (max-width: 768px) {
+  .doc-main {
+    padding: var(--space-8) var(--space-5) var(--space-16);
+  }
+}
+
+/* --- Hero --- */
+.doc-hero {
+  margin-bottom: var(--space-16);
+  padding-bottom: var(--space-12);
+  border-bottom: 1px solid var(--border);
+}
+
+.doc-hero-kicker {
+  font-family: var(--font-body);
+  font-size: var(--size-xs);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: var(--space-5);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.doc-hero-kicker::before {
+  content: '';
+  display: inline-block;
+  width: 20px;
+  height: 2px;
+  background: var(--accent);
+  border-radius: 1px;
+}
+
+.doc-hero h1 {
+  font-family: var(--font-display);
+  font-size: clamp(2.2rem, 5vw, var(--size-4xl));
+  font-weight: 500;
+  line-height: var(--leading-tight);
+  color: var(--ink);
+  letter-spacing: -0.02em;
+  margin-bottom: var(--space-6);
+}
+
+.doc-hero-subtitle {
+  font-family: var(--font-body);
+  font-size: var(--size-lg);
+  line-height: var(--leading-snug);
+  color: var(--ink-secondary);
+  max-width: 64ch;
+}
+
+.doc-hero-meta {
+  margin-top: var(--space-8);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3) var(--space-6);
+  font-size: var(--size-sm);
+  color: var(--ink-tertiary);
+}
+
+.doc-hero-meta-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.doc-hero-meta-item svg {
+  width: 15px;
+  height: 15px;
+  opacity: 0.5;
+}
+
+/* --- Section Headers --- */
+.section-header {
+  margin-top: var(--space-20);
+  margin-bottom: var(--space-8);
+  scroll-margin-top: 80px;
+}
+
+.section-header-label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-family: var(--font-body);
+  font-size: var(--size-xs);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: var(--space-4);
+}
+
+.section-header-label .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+  flex-shrink: 0;
+}
+
+.section-header-label .num {
+  font-family: var(--font-mono);
+  font-size: var(--size-xs);
+  color: var(--ink-faint);
+}
+
+.section-header h2 {
+  font-family: var(--font-display);
+  font-size: var(--size-2xl);
+  font-weight: 500;
+  line-height: var(--leading-tight);
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+
+/* Discussion section headers */
+.section-header.discussion .section-header-label .dot {
+  background: var(--accent-4);
+}
+.section-header.discussion .section-header-label {
+  color: var(--accent-4);
+}
+.section-header.discussion h2 {
+  color: var(--ink);
+}
+
+/* --- Three-column Phase Cards --- */
+.phase-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1.25fr;
+  gap: var(--space-5);
+  margin: var(--space-8) 0;
+}
+
+@media (max-width: 768px) {
+  .phase-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.phase-card {
+  padding: var(--space-6);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  transition: transform var(--duration-fast) var(--ease-out), box-shadow var(--duration-fast) ease;
+  position: relative;
+}
+
+.phase-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.phase-card .phase-label {
+  font-family: var(--font-mono);
+  font-size: var(--size-xs);
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin-bottom: var(--space-3);
+}
+
+.phase-card .phase-title {
+  font-family: var(--font-display);
+  font-size: var(--size-xl);
+  font-weight: 500;
+  margin-bottom: var(--space-2);
+  line-height: var(--leading-tight);
+}
+
+.phase-card .phase-years {
+  font-family: var(--font-mono);
+  font-size: var(--size-xs);
+  color: var(--ink-tertiary);
+  margin-bottom: var(--space-4);
+}
+
+.phase-card .phase-products {
+  font-family: var(--font-mono);
+  font-size: var(--size-xs);
+  color: var(--ink-secondary);
+  margin-bottom: var(--space-4);
+  line-height: 1.6;
+}
+
+.phase-card .phase-desc {
+  font-size: var(--size-sm);
+  color: var(--ink-secondary);
+  line-height: var(--leading-normal);
+}
+
+.phase-card.phase-1 {
+  border-left: 3px solid var(--accent-2);
+}
+.phase-card.phase-1 .phase-label { color: var(--accent-2); }
+
+.phase-card.phase-2 {
+  border-left: 3px solid var(--accent-3);
+}
+.phase-card.phase-2 .phase-label { color: var(--accent-3); }
+
+.phase-card.phase-3 {
+  border-left: 3px solid var(--accent);
+  border: 2px solid rgba(209, 77, 53, 0.3);
+  background: linear-gradient(135deg, var(--surface), rgba(209, 77, 53, 0.04));
+  box-shadow: 0 0 0 1px rgba(209, 77, 53, 0.08), 0 4px 24px rgba(209, 77, 53, 0.08);
+}
+.phase-card.phase-3 .phase-label { color: var(--accent); }
+.phase-card.phase-3:hover {
+  box-shadow: 0 0 0 1px rgba(209, 77, 53, 0.15), 0 8px 32px rgba(209, 77, 53, 0.12);
+}
+.phase-card.phase-3::after {
+  content: 'Our Opportunity';
+  position: absolute;
+  top: var(--space-4);
+  right: var(--space-4);
+  font-family: var(--font-body);
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: var(--accent-soft);
+  padding: var(--space-1) var(--space-3);
+  border-radius: 4px;
+  border: 1px solid rgba(209, 77, 53, 0.15);
+}
+
+/* --- Callout Boxes --- */
+.callout {
+  margin: var(--space-8) 0;
+  padding: var(--space-6);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  position: relative;
+}
+
+.callout-insight {
+  background: var(--accent-2-soft);
+  border-color: rgba(37, 99, 235, 0.15);
+}
+.callout-warning {
+  background: var(--accent-soft);
+  border-color: rgba(209, 77, 53, 0.15);
+}
+.callout-key {
+  background: var(--accent-3-soft);
+  border-color: rgba(13, 148, 136, 0.15);
+}
+.callout-purple {
+  background: var(--accent-4-soft);
+  border-color: rgba(124, 58, 237, 0.15);
+}
+
+.callout-label {
+  font-family: var(--font-body);
+  font-size: var(--size-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: var(--space-3);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+.callout-insight .callout-label { color: var(--accent-2); }
+.callout-warning .callout-label { color: var(--accent); }
+.callout-key .callout-label { color: var(--accent-3); }
+.callout-purple .callout-label { color: var(--accent-4); }
+
+.callout p, .callout li {
+  font-size: var(--size-sm);
+  color: var(--ink-secondary);
+  margin-bottom: var(--space-2);
+  line-height: var(--leading-normal);
+}
+.callout p:last-child, .callout li:last-child { margin-bottom: 0; }
+.callout strong { color: var(--ink); }
+
+/* --- Two-Column Layout --- */
+.two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-6);
+  margin: var(--space-8) 0;
+}
+
+@media (max-width: 768px) {
+  .two-col {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* --- Cards --- */
+.card {
+  padding: var(--space-6);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--duration-fast) var(--ease-out), box-shadow var(--duration-fast) ease;
+}
+
+.card:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.card-title {
+  font-family: var(--font-display);
+  font-size: var(--size-lg);
+  font-weight: 500;
+  margin-bottom: var(--space-4);
+  line-height: var(--leading-snug);
+  color: var(--ink);
+}
+
+.card p, .card li {
+  font-size: var(--size-sm);
+  color: var(--ink-secondary);
+  line-height: var(--leading-normal);
+  margin-bottom: var(--space-2);
+}
+.card p:last-child { margin-bottom: 0; }
+
+.card ul {
+  list-style: none;
+  padding: 0;
+}
+
+.card ul li {
+  padding-left: var(--space-5);
+  position: relative;
+  margin-bottom: var(--space-3);
+}
+
+.card ul li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.6em;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--ink-faint);
+}
+
+.card.border-accent  { border-left: 3px solid var(--accent); }
+.card.border-blue    { border-left: 3px solid var(--accent-2); }
+.card.border-teal    { border-left: 3px solid var(--accent-3); }
+.card.border-purple  { border-left: 3px solid var(--accent-4); }
+.card.border-amber   { border-left: 3px solid var(--accent-5); }
+.card.border-green   { border-left: 3px solid var(--accent-6); }
+
+/* Bullet markers with label colors */
+.card ul li.pain::before   { background: var(--accent); }
+.card ul li.action::before { background: var(--accent-2); }
+.card ul li.change::before { background: var(--accent-3); }
+.card ul li.result::before { background: var(--accent-4); }
+
+/* --- Conclusion Inline --- */
+.conclusion {
+  margin-top: var(--space-4);
+  padding: var(--space-4) var(--space-5);
+  border-radius: 8px;
+  background: var(--accent-soft);
+  border: 1px solid rgba(209, 77, 53, 0.12);
+  font-size: var(--size-sm);
+  color: var(--ink-secondary);
+  line-height: var(--leading-normal);
+}
+
+.conclusion strong {
+  color: var(--accent);
+}
+
+/* --- Scenario Box --- */
+.scenario-box {
+  background: var(--accent-2-soft);
+  border: 1px solid rgba(37, 99, 235, 0.15);
+  border-radius: 12px;
+  padding: var(--space-5);
+  margin-bottom: var(--space-4);
+}
+
+.scenario-box .scenario-label {
+  font-family: var(--font-body);
+  font-size: var(--size-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--accent-2);
+  margin-bottom: var(--space-3);
+}
+
+.scenario-box p {
+  font-size: var(--size-sm);
+  color: var(--ink-secondary);
+  line-height: var(--leading-normal);
+}
+
+.scenario-flow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  margin: var(--space-3) 0;
+}
+
+.scenario-flow .sf-step {
+  font-family: var(--font-mono);
+  font-size: var(--size-xs);
+  padding: var(--space-1) var(--space-3);
+  border-radius: 6px;
+  background: rgba(37, 99, 235, 0.08);
+  color: var(--accent-2);
+  font-weight: 500;
+}
+
+.scenario-flow .sf-arrow {
+  color: var(--ink-faint);
+  font-size: var(--size-xs);
+}
+
+/* --- Caveat Note --- */
+.caveat {
+  font-size: var(--size-xs);
+  color: var(--ink-tertiary);
+  margin-top: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  background: var(--surface-dim);
+  border-radius: 6px;
+  border-left: 2px solid var(--accent-5);
+}
+
+/* --- Chips --- */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: var(--space-4) 0;
+}
+
+.chip {
+  font-family: var(--font-mono);
+  font-size: var(--size-xs);
+  font-weight: 500;
+  padding: var(--space-1) var(--space-3);
+  border-radius: 6px;
+  background: var(--accent-3-soft);
+  color: var(--accent-3);
+  border: 1px solid rgba(13, 148, 136, 0.15);
+}
+
+.chip.chip-accent { background: var(--accent-soft); color: var(--accent); border-color: rgba(209, 77, 53, 0.15); }
+.chip.chip-blue { background: var(--accent-2-soft); color: var(--accent-2); border-color: rgba(37, 99, 235, 0.15); }
+.chip.chip-purple { background: var(--accent-4-soft); color: var(--accent-4); border-color: rgba(124, 58, 237, 0.15); }
+.chip.chip-amber { background: var(--accent-5-soft); color: var(--accent-5); border-color: rgba(217, 119, 6, 0.15); }
+
+/* --- Manufacturing Flow Diagram --- */
+.mfg-flow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0;
+  margin: var(--space-6) 0;
+  padding: var(--space-5);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+.mfg-node {
+  padding: var(--space-2) var(--space-4);
+  border-radius: 8px;
+  font-family: var(--font-mono);
+  font-size: var(--size-xs);
+  font-weight: 500;
+  text-align: center;
+  border: 2px solid var(--border-strong);
+  background: var(--surface);
+  color: var(--ink-secondary);
+  transition: transform var(--duration-fast) var(--ease-spring);
+  white-space: nowrap;
+}
+
+.mfg-node:hover {
+  transform: scale(1.05);
+}
+
+.mfg-node.highlight {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-weight: 600;
+  box-shadow: 0 0 0 3px rgba(209, 77, 53, 0.1);
+}
+
+.mfg-arrow {
+  width: 24px;
+  text-align: center;
+  color: var(--ink-faint);
+  font-size: var(--size-sm);
+  flex-shrink: 0;
+}
+
+/* --- Metric Cards --- */
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-4);
+  margin: var(--space-6) 0;
+}
+
+@media (max-width: 640px) {
+  .metrics-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.metric-card {
+  text-align: center;
+  padding: var(--space-5);
+  border-radius: 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--duration-fast) var(--ease-out);
+}
+
+.metric-card:hover {
+  transform: translateY(-2px);
+}
+
+.metric-value {
+  font-family: var(--font-display);
+  font-size: var(--size-3xl);
+  font-weight: 600;
+  color: var(--accent);
+  line-height: 1.1;
+  margin-bottom: var(--space-2);
+}
+
+.metric-label {
+  font-family: var(--font-body);
+  font-size: var(--size-sm);
+  color: var(--ink-secondary);
+  font-weight: 500;
+}
+
+.metric-sub {
+  font-family: var(--font-mono);
+  font-size: var(--size-xs);
+  color: var(--ink-faint);
+  margin-top: var(--space-1);
+}
+
+/* --- Stacked Bars (Positioning Evolution) --- */
+.stacked-bars {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin: var(--space-6) 0;
+}
+
+.stacked-bar {
+  padding: var(--space-4) var(--space-5);
+  border-radius: 10px;
+  position: relative;
+  overflow: hidden;
+  transition: transform var(--duration-fast) var(--ease-out);
+}
+
+.stacked-bar:hover {
+  transform: translateX(4px);
+}
+
+.stacked-bar .bar-label {
+  font-family: var(--font-body);
+  font-size: var(--size-sm);
+  font-weight: 600;
+  color: var(--ink);
+  margin-bottom: var(--space-1);
+}
+
+.stacked-bar .bar-desc {
+  font-size: var(--size-xs);
+  color: var(--ink-secondary);
+}
+
+.stacked-bar .bar-marker {
+  position: absolute;
+  right: var(--space-4);
+  top: 50%;
+  transform: translateY(-50%);
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  font-weight: 700;
+  color: var(--accent);
+  background: var(--surface);
+  padding: var(--space-1) var(--space-2);
+  border-radius: 4px;
+  border: 1px solid rgba(209, 77, 53, 0.2);
+  letter-spacing: 0.04em;
+}
+
+.bar-stage-1 {
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.1), rgba(37, 99, 235, 0.05));
+  border: 1px solid rgba(37, 99, 235, 0.15);
+}
+
+.bar-stage-2 {
+  background: linear-gradient(135deg, rgba(13, 148, 136, 0.1), rgba(13, 148, 136, 0.05));
+  border: 1px solid rgba(13, 148, 136, 0.15);
+}
+
+.bar-stage-3 {
+  background: linear-gradient(135deg, rgba(209, 77, 53, 0.1), rgba(209, 77, 53, 0.05));
+  border: 1px solid rgba(209, 77, 53, 0.15);
+}
+
+/* --- Progress Items --- */
+.progress-list {
+  list-style: none;
+  padding: 0;
+  margin: var(--space-4) 0;
+}
+
+.progress-list li {
+  padding: var(--space-2) 0;
+  padding-left: var(--space-5);
+  position: relative;
+  font-size: var(--size-sm);
+  color: var(--ink-secondary);
+}
+
+.progress-list li .status-icon {
+  position: absolute;
+  left: 0;
+  top: var(--space-2);
+  font-family: var(--font-mono);
+  font-size: var(--size-sm);
+  font-weight: 600;
+}
+
+.progress-list li .status-done { color: var(--accent-6); }
+.progress-list li .status-wip  { color: var(--accent-5); }
+.progress-list li .status-next { color: var(--accent-2); }
+
+/* --- Challenge Grid --- */
+.challenge-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-4);
+  margin: var(--space-8) 0;
+}
+
+@media (max-width: 900px) {
+  .challenge-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .challenge-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.challenge-card {
+  padding: var(--space-5);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--duration-fast) var(--ease-out), box-shadow var(--duration-fast) ease;
+}
+
+.challenge-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.challenge-card .ch-num {
+  font-family: var(--font-mono);
+  font-size: var(--size-xs);
+  font-weight: 600;
+  color: var(--ink-faint);
+  margin-bottom: var(--space-2);
+}
+
+.challenge-card .ch-problem {
+  font-family: var(--font-body);
+  font-size: var(--size-sm);
+  font-weight: 600;
+  color: var(--accent);
+  margin-bottom: var(--space-3);
+}
+
+.challenge-card .ch-arrow {
+  display: block;
+  width: 20px;
+  height: 2px;
+  background: var(--ink-faint);
+  margin-bottom: var(--space-3);
+  border-radius: 1px;
+}
+
+.challenge-card .ch-solution {
+  font-size: var(--size-sm);
+  color: var(--ink-secondary);
+  line-height: var(--leading-normal);
+}
+
+/* --- Discussion Sections --- */
+.discussion-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-family: var(--font-body);
+  font-size: 0.625rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--accent-4);
+  background: var(--accent-4-soft);
+  padding: var(--space-1) var(--space-3);
+  border-radius: 4px;
+  border: 1px solid rgba(124, 58, 237, 0.15);
+  margin-bottom: var(--space-4);
+}
+
+.discussion-layout {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  gap: var(--space-6);
+  margin: var(--space-6) 0;
+}
+
+@media (max-width: 768px) {
+  .discussion-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.discussion-left {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.discussion-right {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+/* --- Quote / Final Callout --- */
+.quote-callout {
+  margin: var(--space-10) 0;
+  padding: var(--space-8);
+  border-left: 4px solid var(--accent);
+  background: var(--accent-soft);
+  border-radius: 0 16px 16px 0;
+}
+
+.quote-callout p {
+  font-family: var(--font-display);
+  font-size: var(--size-lg);
+  font-style: italic;
+  line-height: var(--leading-snug);
+  color: var(--ink-secondary);
+}
+
+/* --- Three Final Cards --- */
+.final-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-5);
+  margin: var(--space-8) 0;
+}
+
+@media (max-width: 768px) {
+  .final-cards {
+    grid-template-columns: 1fr;
+  }
+}
+
+.final-card {
+  padding: var(--space-6);
+  border-radius: 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+  text-align: center;
+}
+
+.final-card .fc-label {
+  font-family: var(--font-body);
+  font-size: var(--size-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: var(--space-3);
+}
+
+.final-card .fc-text {
+  font-family: var(--font-display);
+  font-size: var(--size-base);
+  font-weight: 500;
+  color: var(--ink);
+  line-height: var(--leading-snug);
+}
+
+.fc-opportunity .fc-label { color: var(--accent-3); }
+.fc-reality .fc-label { color: var(--accent); }
+.fc-next .fc-label { color: var(--accent-2); }
+
+.fc-opportunity { border-top: 3px solid var(--accent-3); }
+.fc-reality { border-top: 3px solid var(--accent); }
+.fc-next { border-top: 3px solid var(--accent-2); }
+
+/* --- Footer --- */
+.doc-footer {
+  margin-top: var(--space-20);
+  padding-top: var(--space-8);
+  border-top: 1px solid var(--border);
+  text-align: center;
+  color: var(--ink-faint);
+  font-size: var(--size-sm);
+}
+
+/* --- Ordered lists inside cards --- */
+.card ol, .discussion-right ol {
+  padding-left: var(--space-6);
+  margin: var(--space-3) 0;
+}
+.card ol li, .discussion-right ol li {
+  font-size: var(--size-sm);
+  color: var(--ink-secondary);
+  margin-bottom: var(--space-2);
+  line-height: var(--leading-normal);
+}
+.card ol li::marker { color: var(--ink-tertiary); }
+
+/* --- Numbered list for sub-questions --- */
+.sub-questions {
+  list-style: decimal;
+  padding-left: var(--space-6);
+  margin: var(--space-4) 0;
+}
+
+.sub-questions li {
+  font-size: var(--size-sm);
+  color: var(--ink-secondary);
+  margin-bottom: var(--space-3);
+  line-height: var(--leading-normal);
+}
+
+/* --- Scroll Animate --- */
+.anim-target {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity var(--duration-slow) var(--ease-out), transform var(--duration-slow) var(--ease-out);
+}
+
+.anim-target.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* --- Utility --- */
+.text-accent { color: var(--accent); }
+.text-blue { color: var(--accent-2); }
+.text-teal { color: var(--accent-3); }
+.text-purple { color: var(--accent-4); }
+.text-amber { color: var(--accent-5); }
+.text-green { color: var(--accent-6); }
+.text-faint { color: var(--ink-faint); }
+.text-secondary { color: var(--ink-secondary); }
+.font-display { font-family: var(--font-display); }
+.font-mono { font-family: var(--font-mono); }
+.fw-600 { font-weight: 600; }
+.mt-4 { margin-top: var(--space-4); }
+.mt-6 { margin-top: var(--space-6); }
+.mb-2 { margin-bottom: var(--space-2); }
+.mb-4 { margin-bottom: var(--space-4); }
+.mb-6 { margin-bottom: var(--space-6); }
+
+/* Flow note */
+.flow-note {
+  font-size: var(--size-xs);
+  color: var(--ink-tertiary);
+  text-align: center;
+  margin-top: var(--space-3);
+  font-style: italic;
+}
+
+/* Statement text */
+.statement {
+  font-family: var(--font-display);
+  font-size: var(--size-base);
+  font-weight: 500;
+  color: var(--ink);
+  line-height: var(--leading-snug);
+  margin-top: var(--space-4);
+  padding-left: var(--space-4);
+  border-left: 2px solid var(--accent);
+}
+
+/* Difference card */
+.diff-card {
+  padding: var(--space-4);
+  border-radius: 8px;
+  background: var(--surface-dim);
+  margin-bottom: var(--space-3);
+}
+
+.diff-card .diff-vs {
+  font-family: var(--font-mono);
+  font-size: var(--size-xs);
+  font-weight: 600;
+  color: var(--accent-4);
+  margin-bottom: var(--space-2);
+}
+
+.diff-card p {
+  font-size: var(--size-sm);
+  color: var(--ink-secondary);
+  line-height: var(--leading-normal);
+  margin: 0;
+}
+
+/* Focus suggestion card */
+.focus-card {
+  padding: var(--space-4);
+  border-radius: 8px;
+  background: var(--surface-dim);
+  margin-bottom: var(--space-3);
+  border-left: 3px solid var(--accent-3);
+}
+
+.focus-card .focus-label {
+  font-family: var(--font-body);
+  font-size: var(--size-xs);
+  font-weight: 700;
+  color: var(--accent-3);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: var(--space-2);
+}
+
+.focus-card p {
+  font-size: var(--size-sm);
+  color: var(--ink-secondary);
+  line-height: var(--leading-normal);
+  margin: 0;
+}
+
+/* Path hypothesis */
+.path-hypothesis {
+  font-size: var(--size-xs);
+  color: var(--ink-tertiary);
+  font-style: italic;
+  margin-top: var(--space-4);
+  padding: var(--space-3);
+  background: var(--surface-dim);
+  border-radius: 6px;
+}
+
+/* --- Print --- */
+@media print {
+  body::after,
+  .doc-topbar,
+  .scroll-progress {
+    display: none !important;
+  }
+  .doc-main {
+    max-width: 100%;
+    padding: 0;
+  }
+  .anim-target {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+</style>
+</head>
+<body>
+
+<!-- Scroll Progress -->
+<div class="scroll-progress" id="scrollProgress"></div>
+
+<!-- Topbar -->
+<header class="doc-topbar">
+  <div class="doc-topbar-brand"><strong>SensePedia</strong> &middot; Opportunity Analysis</div>
+  <div class="doc-topbar-date">2026-03-18</div>
+</header>
+
+<!-- Main Content -->
+<main class="doc-main">
+
+  <!-- ==================== HERO ==================== -->
+  <section class="doc-hero anim-target">
+    <div class="doc-hero-kicker">Opportunity Analysis</div>
+    <h1>大模型应用的三个阶段与 toB 机会</h1>
+    <p class="doc-hero-subtitle">从 ChatGPT 到 Agent 平台：C 端创新已验证范式，政企市场的超级入口机会正在打开</p>
+    <div class="doc-hero-meta">
+      <span class="doc-hero-meta-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        2026-03-18
+      </span>
+      <span class="doc-hero-meta-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        商汤科技 亚太业务事业群
+      </span>
+      <span class="doc-hero-meta-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+        王欣鑫
+      </span>
+    </div>
+  </section>
+
+  <!-- ==================== SECTION 1 ==================== -->
+  <section class="anim-target" id="section-1">
+    <div class="section-header">
+      <div class="section-header-label">
+        <span class="dot"></span>
+        <span>大模型应用阶段</span>
+        <span class="num">01</span>
+      </div>
+      <h2>大模型应用的三个阶段</h2>
+    </div>
+
+    <div class="phase-grid">
+      <!-- Phase 1 -->
+      <div class="phase-card phase-1 anim-target">
+        <div class="phase-label">Phase 1</div>
+        <div class="phase-title">会回答</div>
+        <div class="phase-years">2022 - 2023</div>
+        <div class="phase-products">ChatGPT, 文心一言, 通义千问</div>
+        <div class="phase-desc">大模型从实验室走向大众，核心能力是"对话式问答"。面向C端用户，交互形态是聊天窗口。</div>
+      </div>
+
+      <!-- Phase 2 -->
+      <div class="phase-card phase-2 anim-target">
+        <div class="phase-label">Phase 2</div>
+        <div class="phase-title">会执行</div>
+        <div class="phase-years">2024 - 2025</div>
+        <div class="phase-products">Claude Code, Manus, OpenClaw, 豆包手机</div>
+        <div class="phase-desc">从"回答问题"进化到"执行任务"。Agent 能调用工具、操作系统、编排工作流。仍以C端开发者和个人用户为主。</div>
+      </div>
+
+      <!-- Phase 3 (highlighted) -->
+      <div class="phase-card phase-3 anim-target">
+        <div class="phase-label">Phase 3</div>
+        <div class="phase-title">会经营</div>
+        <div class="phase-years">2026 &rarr;</div>
+        <div class="phase-products">SensePedia Agent Platform</div>
+        <div class="phase-desc">将 Agent 能力注入政企核心业务流。不是替代现有系统，而是成为跨系统工作流的交互层和编排层——政企客户的超级入口。</div>
+      </div>
+    </div>
+
+    <!-- Callout -->
+    <div class="callout callout-key anim-target">
+      <div class="callout-label">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+        Key Insight
+      </div>
+      <p><strong>第一、第二阶段的产品都面向 C 端用户。toB 市场存在巨大空白——这正是 SensePedia Agent Platform 的机会窗口。</strong></p>
+    </div>
+  </section>
+
+  <!-- ==================== SECTION 2 ==================== -->
+  <section class="anim-target" id="section-2">
+    <div class="section-header">
+      <div class="section-header-label">
+        <span class="dot"></span>
+        <span>案例与跃迁</span>
+        <span class="num">02</span>
+      </div>
+      <h2>Agent 不是替代系统，而是成为交互中心</h2>
+    </div>
+
+    <div class="two-col">
+      <!-- Left: Case Study -->
+      <div class="card border-blue anim-target">
+        <div class="card-title">量化交易案例（简述）</div>
+        <ul>
+          <li class="pain"><strong>痛:</strong> 多源数据、多系统切换，人工盯盘耗时耗力</li>
+          <li class="action"><strong>做:</strong> 通过 OpenClaw + Skills，把抓因子、分析、下单、监控、告警串成 Telegram Bot 工作流</li>
+          <li class="change"><strong>变:</strong> 日常入口从交易所/量化系统变成 Agent，只有紧急告警才回原系统</li>
+          <li class="result"><strong>结:</strong> 关键变化不是功能替代，而是交互层重构</li>
+        </ul>
+      </div>
+
+      <!-- Right: Transition -->
+      <div class="card border-teal anim-target">
+        <div class="card-title">从个人到企业的跃迁</div>
+        <ul>
+          <li><strong>个人场景:</strong> 1 用户、3-4 个系统、自己管自己</li>
+          <li><strong>企业场景:</strong> 数百用户、7-8 个核心系统、多角色权限、合规审计、数据不统一</li>
+        </ul>
+        <div class="conclusion">
+          <strong>方向对，但路径不能天真。</strong>个人 Agent 验证了交互范式的变化。但企业场景的复杂度是量级差异，不是简单放大。
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== SECTION 3 ==================== -->
+  <section class="anim-target" id="section-3">
+    <div class="section-header">
+      <div class="section-header-label">
+        <span class="dot"></span>
+        <span>制造业场景预览</span>
+        <span class="num">03</span>
+      </div>
+      <h2>跨系统工作流编排：Agent 最有价值的切入点</h2>
+    </div>
+
+    <div class="two-col">
+      <!-- Left -->
+      <div class="anim-target">
+        <!-- Scenario Box -->
+        <div class="scenario-box">
+          <div class="scenario-label">Scenario Preview</div>
+          <p>采购经理在飞书问 Agent："昨天那批电容到货了吗？"</p>
+          <div class="scenario-flow">
+            <span class="sf-step">Agent</span>
+            <span class="sf-arrow">&rarr;</span>
+            <span class="sf-step">SRM 查物流状态</span>
+            <span class="sf-arrow">&rarr;</span>
+            <span class="sf-step">ERP 查入库记录</span>
+            <span class="sf-arrow">&rarr;</span>
+            <span class="sf-step">QMS 查来料检验</span>
+          </div>
+          <p>30 秒返回跨系统状态报告</p>
+        </div>
+
+        <div class="caveat">基于平台架构设计的场景预览，尚未对接真实系统</div>
+
+        <div class="mt-6">
+          <p class="mb-2 fw-600" style="font-size: var(--size-sm); color: var(--ink);">Agent 高价值切入点</p>
+          <div class="chips">
+            <span class="chip chip-accent">采购跟催 SRM&#8596;ERP</span>
+            <span class="chip">质检报告 QMS&rarr;ERP</span>
+            <span class="chip chip-blue">订单状态 CRM&rarr;ERP&rarr;MES&rarr;WMS</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right -->
+      <div class="anim-target">
+        <p class="mb-4 fw-600" style="font-size: var(--size-sm); color: var(--ink);">制造业全链路工作流</p>
+        <div class="mfg-flow">
+          <span class="mfg-node">CRM</span>
+          <span class="mfg-arrow">&rarr;</span>
+          <span class="mfg-node">CAD</span>
+          <span class="mfg-arrow">&rarr;</span>
+          <span class="mfg-node">PLM</span>
+          <span class="mfg-arrow">&rarr;</span>
+          <span class="mfg-node">ERP</span>
+          <span class="mfg-arrow">&rarr;</span>
+          <span class="mfg-node highlight">SRM</span>
+          <span class="mfg-arrow">&rarr;</span>
+          <span class="mfg-node">MES</span>
+          <span class="mfg-arrow">&rarr;</span>
+          <span class="mfg-node highlight">QMS</span>
+          <span class="mfg-arrow">&rarr;</span>
+          <span class="mfg-node">WMS/TMS</span>
+        </div>
+        <p class="flow-note">高亮节点为 Agent 优先切入点：流程跨系统、查询频次高、痛感强、可闭环</p>
+
+        <div class="statement mt-6">
+          制造业工作流最长（8 个核心系统）、跨角色协同最强——Agent 编排价值最高
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== SECTION 4 ==================== -->
+  <section class="anim-target" id="section-4">
+    <div class="section-header">
+      <div class="section-header-label">
+        <span class="dot"></span>
+        <span>战略聚焦</span>
+        <span class="num">04</span>
+      </div>
+      <h2>为什么先打制造业，为什么先打亚太</h2>
+    </div>
+
+    <div class="two-col">
+      <!-- Left: GDP Metrics -->
+      <div class="anim-target">
+        <p class="mb-4 fw-600" style="font-size: var(--size-sm); color: var(--ink);">制造业 GDP 占比</p>
+        <div class="metrics-grid" style="grid-template-columns: repeat(2, 1fr);">
+          <div class="metric-card">
+            <div class="metric-value">27%</div>
+            <div class="metric-label">中国</div>
+            <div class="metric-sub">China</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-value">26%</div>
+            <div class="metric-label">韩国</div>
+            <div class="metric-sub">South Korea</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-value">34%</div>
+            <div class="metric-label">台湾</div>
+            <div class="metric-sub">Taiwan</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-value">24%</div>
+            <div class="metric-label">越南</div>
+            <div class="metric-sub">Vietnam</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Focus Suggestions -->
+      <div class="anim-target">
+        <p class="mb-4 fw-600" style="font-size: var(--size-sm); color: var(--ink);">聚焦建议</p>
+        <div class="chips" style="flex-direction: column; align-items: stretch;">
+          <div class="focus-card" style="border-left-color: var(--accent);">
+            <div class="focus-label" style="color: var(--accent);">优先</div>
+            <p>制造业（电子、高科技、装备制造）</p>
+          </div>
+          <div class="focus-card" style="border-left-color: var(--accent-2);">
+            <div class="focus-label" style="color: var(--accent-2);">区域</div>
+            <p>先中国长三角/珠三角 + 越南试点</p>
+          </div>
+          <div class="focus-card" style="border-left-color: var(--accent-5);">
+            <div class="focus-label" style="color: var(--accent-5);">第二梯队</div>
+            <p>金融保险（新加坡、香港），但合规门槛更高</p>
+          </div>
+        </div>
+        <div class="statement mt-6">聚焦比铺开更重要</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== SECTION 5 ==================== -->
+  <section class="anim-target" id="section-5">
+    <div class="section-header">
+      <div class="section-header-label">
+        <span class="dot"></span>
+        <span>落地路径</span>
+        <span class="num">05</span>
+      </div>
+      <h2>先做编排层，再争取入口层</h2>
+    </div>
+
+    <div class="two-col">
+      <!-- Left: Stacked Bars -->
+      <div class="anim-target">
+        <p class="mb-4 fw-600" style="font-size: var(--size-sm); color: var(--ink);">三阶段定位演进</p>
+        <div class="stacked-bars">
+          <div class="stacked-bar bar-stage-1">
+            <div class="bar-label">阶段 1：助手层</div>
+            <div class="bar-desc">帮人查信息、调工具、发通知</div>
+            <div class="bar-marker">我们在这里</div>
+          </div>
+          <div class="stacked-bar bar-stage-2">
+            <div class="bar-label">阶段 2：编排层</div>
+            <div class="bar-desc">串联多个系统，让流程跨系统跑起来</div>
+          </div>
+          <div class="stacked-bar bar-stage-3">
+            <div class="bar-label">阶段 3：入口层</div>
+            <div class="bar-desc">员工主要通过 Agent 平台完成工作</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Current Status -->
+      <div class="anim-target">
+        <p class="mb-4 fw-600" style="font-size: var(--size-sm); color: var(--ink);">我们现在在哪</p>
+        <div class="card border-teal">
+          <ul class="progress-list">
+            <li>
+              <span class="status-icon status-done">&#10003;</span>
+              公共骨架 + LLM Gateway 已完成闭环验证
+            </li>
+            <li>
+              <span class="status-icon status-wip">&#9881;</span>
+              Agent Router、RAG、Knowledge Ingestion 架构设计已完成
+            </li>
+            <li>
+              <span class="status-icon status-next">&#9654;</span>
+              下一步：Knowledge Ingestion + RAG 闭环
+            </li>
+          </ul>
+          <div class="path-hypothesis">
+            路径假设（非定论）：短期行业方案切入 &rarr; 中期提取平台能力 &rarr; 长期开放生态
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== SECTION 6 ==================== -->
+  <section class="anim-target" id="section-6">
+    <div class="section-header">
+      <div class="section-header-label">
+        <span class="dot"></span>
+        <span>现实挑战</span>
+        <span class="num">06</span>
+      </div>
+      <h2>真正难的不是模型，而是把 Agent 嵌入真实业务流程</h2>
+    </div>
+
+    <div class="challenge-grid">
+      <div class="challenge-card anim-target">
+        <div class="ch-num">01</div>
+        <div class="ch-problem">系统异构集成成本高</div>
+        <span class="ch-arrow"></span>
+        <div class="ch-solution">先做 API 已开放的系统，积累连接器资产</div>
+      </div>
+      <div class="challenge-card anim-target">
+        <div class="ch-num">02</div>
+        <div class="ch-problem">安全合规责任边界高</div>
+        <span class="ch-arrow"></span>
+        <div class="ch-solution">关键操作保留人工确认 + 全链路审计</div>
+      </div>
+      <div class="challenge-card anim-target">
+        <div class="ch-num">03</div>
+        <div class="ch-problem">数据质量不统一</div>
+        <span class="ch-arrow"></span>
+        <div class="ch-solution">先做"查询展示"不做"自动执行"</div>
+      </div>
+      <div class="challenge-card anim-target">
+        <div class="ch-num">04</div>
+        <div class="ch-problem">商业生态不配合</div>
+        <span class="ch-arrow"></span>
+        <div class="ch-solution">先找实施伙伴和国产厂商合作</div>
+      </div>
+      <div class="challenge-card anim-target">
+        <div class="ch-num">05</div>
+        <div class="ch-problem">产品化 vs 项目化张力</div>
+        <span class="ch-arrow"></span>
+        <div class="ch-solution">短期项目制验证，中期提取平台</div>
+      </div>
+      <div class="challenge-card anim-target">
+        <div class="ch-num">06</div>
+        <div class="ch-problem">客户组织变革阻力</div>
+        <span class="ch-arrow"></span>
+        <div class="ch-solution">把 IT 变成共建者，不说"替代"说"增强"</div>
+      </div>
+    </div>
+
+    <div class="caveat anim-target">以上应对方向是初步判断，每一项都需要通过实际客户验证</div>
+  </section>
+
+  <!-- ==================== SECTION 7 (Discussion 1) ==================== -->
+  <section class="anim-target" id="section-7">
+    <div class="section-header discussion">
+      <div class="section-header-label">
+        <span class="dot"></span>
+        <span>讨论</span>
+        <span class="num">07</span>
+      </div>
+      <h2>客户为什么会为这类 Agent Platform 买单？</h2>
+    </div>
+
+    <div class="discussion-layout">
+      <!-- Left -->
+      <div class="discussion-left anim-target">
+        <div class="discussion-tag">Discussion &middot; 请从各自角色出发给观点</div>
+      </div>
+
+      <!-- Right -->
+      <div class="discussion-right anim-target">
+        <div class="card border-blue">
+          <div class="card-title">背景</div>
+          <ul>
+            <li>制造业 IT 预算被 SAP/MES/CRM 锁定</li>
+            <li>Agent Platform 的预算从哪里出？</li>
+            <li>客户已有 RPA 在跑，为什么要换？</li>
+          </ul>
+        </div>
+        <div class="card border-teal">
+          <div class="card-title">种子观点</div>
+          <ul>
+            <li>不卖"入口"，卖"效率提升"——采购跟催从 2 小时变 5 分钟</li>
+            <li>可能的预算来源：数字化转型专项 / 降本增效专项 / IT 创新预算</li>
+            <li>商业模式候选：项目制（短期）&rarr; 订阅制（中期）&rarr; 平台+分成（长期）</li>
+          </ul>
+          <div class="caveat" style="margin-top: var(--space-4);">以上为讨论假设，尚无客户验证</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== SECTION 8 (Discussion 2) ==================== -->
+  <section class="anim-target" id="section-8">
+    <div class="section-header discussion">
+      <div class="section-header-label">
+        <span class="dot"></span>
+        <span>讨论</span>
+        <span class="num">08</span>
+      </div>
+      <h2>售前第一次见客户，应该怎么讲，才不会被理解成"更贵的集成项目"？</h2>
+    </div>
+
+    <div class="discussion-layout">
+      <!-- Left -->
+      <div class="discussion-left anim-target">
+        <div class="discussion-tag">Discussion &middot; 请从各自角色出发给观点</div>
+
+        <div class="card border-purple">
+          <div class="card-title">差异化定位</div>
+
+          <div class="diff-card">
+            <div class="diff-vs">vs 钉钉/飞书 AI</div>
+            <p>他们做办公协同+AI增强，我们做行业工作流级 Agent 编排——对接 ERP/MES/PLM，不是聊天和审批</p>
+          </div>
+
+          <div class="diff-card">
+            <div class="diff-vs">vs Copilot</div>
+            <p>绑微软生态（Office+Azure），我们做跨厂商跨系统的行业编排层——不绑定特定生态</p>
+          </div>
+
+          <div class="diff-card">
+            <div class="diff-vs">vs Coze / Dify</div>
+            <p>通用 Agent 开发平台，我们做行业纵深——沉淀制造业 skill 库而非通用工具</p>
+          </div>
+
+          <div class="caveat">以上差异化方向待验证，Copilot connector 生态已很强</div>
+        </div>
+      </div>
+
+      <!-- Right -->
+      <div class="discussion-right anim-target">
+        <div class="card border-accent">
+          <div class="card-title">PoC 思路</div>
+          <ol>
+            <li><strong>最容易打动客户的 PoC：</strong>跨系统订单状态查询（客户每天在做，痛感强）</li>
+            <li><strong>PoC 周期挑战：</strong>需要客户开放测试环境 API</li>
+            <li><strong>单系统快速对接：</strong>先对接客户已有 Open API 的单个系统（如 ERP 查询），验证 Agent 交互体验后再扩展到跨系统</li>
+            <li><strong>文件级数据分析切入：</strong>客户上传 Excel/CSV 业务数据，通过小浣熊 Skill 直接分析出图表和洞察——零系统对接、当场出效果</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== SECTION 9 (Discussion 3) ==================== -->
+  <section class="anim-target" id="section-9">
+    <div class="section-header discussion">
+      <div class="section-header-label">
+        <span class="dot"></span>
+        <span>讨论</span>
+        <span class="num">09</span>
+      </div>
+      <h2>我们现在应该优先做行业方案、平台能力，还是两者结合？边界怎么定？</h2>
+    </div>
+
+    <div class="discussion-layout">
+      <!-- Left -->
+      <div class="discussion-left anim-target">
+        <div class="discussion-tag">Discussion &middot; 请从各自角色出发给观点</div>
+
+        <div class="card border-amber">
+          <div class="card-title">核心张力</div>
+          <ul>
+            <li><strong>P 主攻平台 PaaS：</strong>客户是开发者/ISV，离行业场景远</li>
+            <li><strong>S 主攻行业方案：</strong>每个客户定制，很难规模化</li>
+          </ul>
+          <div class="conclusion" style="margin-top: var(--space-4);">
+            <strong>当前假设：</strong>先做 1 个行业（制造业）闭环，在交付中沉淀平台能力
+          </div>
+        </div>
+      </div>
+
+      <!-- Right -->
+      <div class="discussion-right anim-target">
+        <div class="card border-blue">
+          <div class="card-title">需要碰撞的子问题</div>
+          <ol class="sub-questions">
+            <li>哪些 skill 能跨客户复用？哪些必须定制？</li>
+            <li>第一个客户的交付边界画在哪？</li>
+            <li>团队需要什么新能力（行业顾问？系统对接工程师？）</li>
+            <li>在巨头（Copilot / SAP Joule / Salesforce Agentforce）之间，我们的生存空间在哪？</li>
+          </ol>
+          <div class="path-hypothesis">初步判断：行业纵深 + 私有化部署 + 本地化服务</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== SECTION 10 ==================== -->
+  <section class="anim-target" id="section-10">
+    <div class="section-header">
+      <div class="section-header-label">
+        <span class="dot"></span>
+        <span>收口</span>
+        <span class="num">10</span>
+      </div>
+      <h2>今天不追求完整共识，而是把关键问题摆上桌面</h2>
+    </div>
+
+    <div class="final-cards anim-target">
+      <div class="final-card fc-opportunity">
+        <div class="fc-label">一句话机会</div>
+        <div class="fc-text">ToB 机会在于成为跨系统工作流的交互层和编排层</div>
+      </div>
+      <div class="final-card fc-reality">
+        <div class="fc-label">一句话现实</div>
+        <div class="fc-text">最大的难点不是模型，而是集成、合规、数据和可复制性</div>
+      </div>
+      <div class="final-card fc-next">
+        <div class="fc-label">一句话下一步</div>
+        <div class="fc-text">选一个具体的制造业场景，定义"最小可卖方案"，启动内部 workshop</div>
+      </div>
+    </div>
+
+    <div class="quote-callout anim-target">
+      <p>我的判断不是企业软件会被立刻替代，而是企业软件的使用方式会被重构。但路径上必须克制，先从高价值、可闭环的流程切入。</p>
+    </div>
+  </section>
+
+  <!-- ==================== FOOTER ==================== -->
+  <footer class="doc-footer anim-target">
+    Opportunity Analysis &middot; 2026 &middot; 商汤科技
+  </footer>
+
+</main>
+
+<!-- ==================== SCRIPTS ==================== -->
+<script>
+(function() {
+  // --- Scroll Progress Bar ---
+  const progressBar = document.getElementById('scrollProgress');
+  function updateProgress() {
+    const scrollTop = window.scrollY || document.documentElement.scrollTop;
+    const docHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+    const scrollPercent = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+    progressBar.style.width = scrollPercent + '%';
+  }
+  window.addEventListener('scroll', updateProgress, { passive: true });
+  updateProgress();
+
+  // --- IntersectionObserver: Animate-in on scroll ---
+  const targets = document.querySelectorAll('.anim-target');
+  const observer = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, {
+    threshold: 0.08,
+    rootMargin: '0px 0px -40px 0px'
+  });
+
+  targets.forEach(function(el) {
+    observer.observe(el);
+  });
+})();
+</script>
+
+</body>
+</html>
