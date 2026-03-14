@@ -1,0 +1,86 @@
+sequenceDiagram
+    autonumber
+    actor U as "User / Client"
+    participant CA as "Channel Adapter"
+    participant GW as "API Gateway"
+    participant AR as "Agent Router"
+    participant BA as "Selected Business Agent / Main Agent"
+    participant SA as "Sub Agent"
+    participant P as "SensePedia Core / LLM Planner"
+    participant PV as "PlanValidator"
+    participant E as "SensePedia Core / Graph Executor"
+    participant MS as "Memory Service"
+    participant KI as "Knowledge Infrastructure"
+    participant LLM as "LLM Gateway"
+    participant TR as "Tool Registry"
+    participant TX as "Tool / Skill Executor"
+    participant HO as "HostOps API"
+    participant PI as "Pi Runtime"
+    participant EXT as "External Systems (DB / Milvus / MinIO / Web)"
+    participant OB as "Observability (LangFuse / Metrics / Logs)"
+
+    U->>CA: Send request (message / API)
+    CA->>GW: Normalize + Auth context
+    GW->>AR: Route decision request
+    alt Router mode = single_agent
+        AR->>AR: Bind fixed agent (for example legal_agent)
+    else Router mode = configured_routing
+        AR->>AR: Apply tenant / channel / capability rules
+    else Router mode = dynamic_routing
+        AR->>AR: Evaluate rules + intent + fallback
+    end
+    AR->>BA: Forward request + routing context
+
+    opt Runtime multi-agent enabled for this request
+        BA->>SA: SubAgentCall(goal + scoped context)
+        SA-->>BA: Partial result + evidence refs
+    end
+
+    BA->>P: Ask to plan within agent scope
+
+    opt Recall durable memory / user prefs
+        P->>MS: Recall(thread_id, user_id)
+        MS-->>P: Memory context
+    end
+
+    opt Use shared knowledge capabilities
+        P->>KI: Capability check / retrieve primitives
+        KI-->>P: Available tools + constraints
+    end
+
+    P->>LLM: Request structured plan (ExecutionPlan schema)
+    LLM-->>P: Structured plan candidate
+    P->>PV: Validate(plan + agent scope + limits)
+    PV->>TR: Check tool existence + auth scope + deps
+    TR-->>PV: Tool metadata
+    PV-->>P: Approved plan / validation errors
+    P->>E: Submit validated plan + initial state
+
+    loop For each task (serial or parallel)
+        E->>TR: Resolve tool + policy
+        TR-->>E: Tool binding (impl + schema)
+        alt Task targets HostOps
+            E->>HO: Execute hostops action
+            HO->>PI: Run exec / ssh / files action
+            PI-->>HO: Result / pending approval / error
+            HO-->>E: Normalized hostops result
+        else Task targets local skill or shared tool
+            par Execute tool and trace
+                E->>TX: Execute(tool, params)
+                TX->>EXT: Call external dependency
+                EXT-->>TX: Result / error
+                TX-->>E: Tool result
+            and
+                E->>OB: Emit spans + events
+            end
+        end
+        opt Checkpoint / state snapshot
+            E->>MS: Persist checkpoint + summary
+            MS-->>E: Ack
+        end
+    end
+
+    E-->>BA: Final answer + citations / artifacts
+    BA-->>GW: Response (optionally streaming)
+    GW-->>CA: Deliver
+    CA-->>U: Show answer
