@@ -675,12 +675,25 @@ a:hover { text-decoration: underline; text-underline-offset: 3px; }
   transform: scale(1.05);
 }
 
+.mfg-node small {
+  display: block;
+  font-family: var(--font-body);
+  font-size: 0.65rem;
+  font-weight: 400;
+  opacity: 0.6;
+  margin-top: 2px;
+}
+
 .mfg-node.highlight {
   border-color: var(--accent);
   background: var(--accent-soft);
   color: var(--accent);
   font-weight: 600;
   box-shadow: 0 0 0 3px rgba(209, 77, 53, 0.1);
+}
+
+.mfg-node.highlight small {
+  opacity: 0.8;
 }
 
 .mfg-arrow {
@@ -1304,21 +1317,21 @@ a:hover { text-decoration: underline; text-underline-offset: 3px; }
       <div class="anim-target">
         <p class="mb-4 fw-600" style="font-size: var(--size-sm); color: var(--ink);">制造业全链路工作流</p>
         <div class="mfg-flow">
-          <span class="mfg-node">CRM</span>
+          <span class="mfg-node">CRM<small>接单</small></span>
           <span class="mfg-arrow">&rarr;</span>
-          <span class="mfg-node">CAD</span>
+          <span class="mfg-node">CAD/CAE<small>设计</small></span>
           <span class="mfg-arrow">&rarr;</span>
-          <span class="mfg-node">PLM</span>
+          <span class="mfg-node">PLM<small>研发管理</small></span>
           <span class="mfg-arrow">&rarr;</span>
-          <span class="mfg-node">ERP</span>
+          <span class="mfg-node">ERP<small>资源计划</small></span>
           <span class="mfg-arrow">&rarr;</span>
-          <span class="mfg-node highlight">SRM</span>
+          <span class="mfg-node highlight">SRM<small>采购</small></span>
           <span class="mfg-arrow">&rarr;</span>
-          <span class="mfg-node">MES</span>
+          <span class="mfg-node">MES<small>生产执行</small></span>
           <span class="mfg-arrow">&rarr;</span>
-          <span class="mfg-node highlight">QMS</span>
+          <span class="mfg-node highlight">QMS<small>质量</small></span>
           <span class="mfg-arrow">&rarr;</span>
-          <span class="mfg-node">WMS/TMS</span>
+          <span class="mfg-node">WMS/TMS<small>仓储物流</small></span>
         </div>
         <p class="flow-note">高亮节点为 Agent 优先切入点：流程跨系统、查询频次高、痛感强、可闭环</p>
 
